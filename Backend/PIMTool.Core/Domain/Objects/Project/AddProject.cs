@@ -1,10 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace PIMTool.Core.Domain.Entities
+namespace PIMTool.Core.Domain.Objects.Project
 {
-    public class Project : IEntity
+    public class AddProject
     {
-        public int Id { get; set; }
         public string Name { get; set; } = null!;
 
         public int ProjectNumber { get; set; }
@@ -19,10 +23,7 @@ namespace PIMTool.Core.Domain.Entities
 
         public int GroupId { get; set; }
 
-        public Group? Group { get; set; } = null;
-        public byte[]? Version { get; set; }
-
-        public ICollection<ProjectEmployee> projectEmployees { get; set; } = null!;
+        public String Members { get; set; }
 
     }
 }

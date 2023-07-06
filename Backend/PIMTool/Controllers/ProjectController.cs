@@ -2,8 +2,9 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using PIMTool.Core.Domain.Entities;
+using PIMTool.Core.Domain.Objects.Project;
 using PIMTool.Core.Interfaces.Services;
-using PIMTool.Dtos;
+using PIMTool.Dtos.ProjectDtos;
 
 namespace PIMTool.Controllers
 {
@@ -29,10 +30,33 @@ namespace PIMTool.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ProjectDto>> Add(Project project)
+        public async Task<ActionResult<String>> Add(AddProject project)
         {
             var entity = await _projectService.AddAsync(project);
-            return Ok(_mapper.Map<ProjectDto>(entity));
+            return Ok(entity);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<String>> Update(UpdateProject project)
+        {
+            var entity = await _projectService.UpdateAsync(project);
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<ProjectDto>>> GetAll()
+        {
+            var result = await _projectService.GetAll();
+            return Ok(_mapper.Map<List<ProjectDto>>(result));
+        }
+
+        [HttpPost]
+        [Route("search")]
+        public async Task<ActionResult<List<ProjectDto>>> Fillter([FromBody] SearchProject searchProject)
+        {
+            var result = await _projectService.Search(searchProject);
+            return Ok(_mapper.Map<List<ProjectDto>>(result));
+
         }
     }
 }

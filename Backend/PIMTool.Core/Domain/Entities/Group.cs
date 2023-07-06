@@ -12,10 +12,10 @@ namespace PIMTool.Core.Domain.Entities
 
         public int? GroupLeaderId { get; set; }
 
-        public byte[] Version { get; set; }
+        public byte[] Version { get; set; } = Array.Empty<byte>()!;
 
         public Employee Employee { get; set; } = null!;
 
-        public ICollection<Project> Projects { get; set; }
+        public ICollection<Project> Projects { get; set; } = null!;
     }
 }

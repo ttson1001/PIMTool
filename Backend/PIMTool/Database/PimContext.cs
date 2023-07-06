@@ -101,6 +101,7 @@ namespace PIMTool.Database
                     .HasColumnName("PROJECT_ID");
                     entity.Property(e => e.EmployeeId)
                     .HasColumnName("EMPLOYEE_ID");
+                    entity.Ignore(e => e.Id);
                     entity.HasKey(e => new { e.ProjectId, e.EmployeeId });
                     entity.HasOne(e => e.Employee)
                     .WithMany(p => p.ProjectEmployees)

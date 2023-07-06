@@ -4,7 +4,7 @@ using PIMTool.Core.Domain.Objects.Group;
 using PIMTool.Core.Interfaces.Repositories;
 using PIMTool.Core.Interfaces.Services;
 
-namespace PIMTool.Repositories
+namespace PIMTool.Services
 {
     public class GroupService : IGroupService
     {
@@ -26,7 +26,7 @@ namespace PIMTool.Repositories
             {
                 Employee = entity
             };
-            
+
             await _groupRepository.AddAsync(newGroup, cancellationToken);
             await _groupRepository.SaveChangesAsync(cancellationToken);
             return "Add Susscessfull!!!";
