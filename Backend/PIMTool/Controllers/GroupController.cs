@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PIMTool.Core.Domain.Entities;
 using PIMTool.Core.Domain.Objects.Group;
+using PIMTool.Core.Exceptions.Group;
 using PIMTool.Core.Interfaces.Services;
+using PIMTool.Dtos;
 using PIMTool.Dtos.GroupDtos;
 using System.ComponentModel.DataAnnotations;
 
@@ -23,18 +25,28 @@ namespace PIMTool.Controllers
         }
 
         [HttpGet("{id}")]
-
         public async Task<ActionResult<GroupDto>> Get([FromRoute][Required] int id)
         {
             var entity = await _groupService.GetAsync(id);
-            return Ok(_mapper.Map<GroupDto>(entity));
+            return Ok(new SendResponseDto
+            {
+                StatusCode = 200,
+                Message = "Find successful",
+                Data = _mapper.Map<GroupDto>(entity)
+            });
+
         }
 
         [HttpPost]
         public async Task<ActionResult<String>> Add([FromBody] AddGroup addGroup)
         {
             var entity = await _groupService.AddAsync(addGroup);
-            return Ok(entity);
+            return Ok(new SendResponseDto
+            {
+                StatusCode = 200,
+                Message = "Add Group successful",
+                Data = entity
+            });
 
         }
 
@@ -43,8 +55,13 @@ namespace PIMTool.Controllers
         {
             var entity = await _groupService.UpdateAsync(updateGroup);
 
-            return Ok(_mapper.Map<GroupDto>(entity));
-            
+            return Ok(new SendResponseDto
+            {
+                StatusCode = 200,
+                Message = "Update Group successful",
+                Data = _mapper.Map<GroupDto>(entity)
+            });
+
         }
 
         [HttpGet]
@@ -52,7 +69,13 @@ namespace PIMTool.Controllers
         public async Task<ActionResult<List<Group>>> GetAll()
         {
             var response = await _groupService.GetAllAsync();
-            return Ok(_mapper.Map<List<GroupDto>>(response));
+           
+             return Ok(new SendResponseDto
+             {
+                 StatusCode = 200,
+                 Message = "Get All Group successful",
+                 Data = _mapper.Map<GroupDto>(_mapper.Map<List<GroupDto>>(response))
+             });
         }
     }
 }

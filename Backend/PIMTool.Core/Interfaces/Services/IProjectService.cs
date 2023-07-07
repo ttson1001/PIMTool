@@ -11,5 +11,7 @@ namespace PIMTool.Core.Interfaces.Services
         Task<String> UpdateAsync(UpdateProject updateProject, CancellationToken cancellationToken = default);
 
         Task<List<Project>?> Search(SearchProject searchProject, CancellationToken cancellationToken = default);
+
+        Task<String> Delete(List<int> ids);
     }
 }

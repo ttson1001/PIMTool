@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PIMTool.Core.Domain.Entities;
 using PIMTool.Core.Domain.Objects.Employee;
+using PIMTool.Core.Exceptions.Employee;
 using PIMTool.Core.Interfaces.Services;
+using PIMTool.Dtos;
 using PIMTool.Dtos.EmployeeDtos;
+using PIMTool.Dtos.GroupDtos;
 using System.ComponentModel.DataAnnotations;
 
 namespace PIMTool.Controllers
@@ -24,43 +28,59 @@ namespace PIMTool.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<String>> Add(AddEmployee addEmployee)
+        public async Task<ActionResult> Add(AddEmployee addEmployee)
         {
-            try
+            var enity = await _employeeService.AddAsync(addEmployee);
+            return Ok(new SendResponseDto
             {
-                var enity = await _employeeService.AddAsync(addEmployee);
-                return Ok(enity);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+                StatusCode = 200,
+                Message = "Add Employee Successfull",
+                Data = enity
+            });
 
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<EmployeeDto>> Get([FromRoute][Required] int id)
+        public async Task<ActionResult<SendResponseDto>> Get([FromRoute][Required] int id)
         {
             var entity = await _employeeService.GetAsync(id);
-            return Ok(_mapper.Map<EmployeeDto>(entity));
+
+            return Ok(new SendResponseDto
+            {
+                StatusCode = 200,
+                Message = "Get Employee Successfull",
+                Data = _mapper.Map<EmployeeDto>(entity)
+            });
+
         }
 
         [HttpPut]
-        public async Task<ActionResult<EmployeeDto>> Update([FromBody] UpdateEmployee updateEmployee)
+        public async Task<ActionResult> Update([FromBody] UpdateEmployee updateEmployee)
         {
-            var entity = await _employeeService.UpdateAsync(updateEmployee);
-            return Ok(_mapper.Map<EmployeeDto>(entity));
+            var enity = await _employeeService.UpdateAsync(updateEmployee);
+
+            return Ok(new SendResponseDto
+            {
+                StatusCode = 200,
+                Message = "Update Employee Successfull",
+                Data = enity
+            });
         }
 
         [HttpGet]
-        public ActionResult<EmployeeDto> GetAll()
+        public async Task<ActionResult<SendResponseDto>> GetAll()
         {
-            var e = _employeeService.GetAll();
-            return Ok(_mapper.Map<List<EmployeeDto>>(e));
+            var result = await _employeeService.GetAll();
+            return Ok(new SendResponseDto
+            {
+                StatusCode = 200,
+                Message = "Get all employee Successfull",
+                Data = _mapper.Map<List<EmployeeDto>>(result)
+            });
         }
 
         [HttpDelete]
-        public ActionResult<String> Delete([FromBody]List<int> listId)
+        public ActionResult<String> Delete([FromBody] List<int> listId)
         {
             var e = _employeeService.Delete(listId);
             return Ok(e);

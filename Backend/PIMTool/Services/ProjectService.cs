@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PIMTool.Core.Domain.Entities;
 using PIMTool.Core.Domain.Objects.Project;
+using PIMTool.Core.Exceptions.Employee;
+using PIMTool.Core.Exceptions.Group;
+using PIMTool.Core.Exceptions.Project;
 using PIMTool.Core.Interfaces.Repositories;
 using PIMTool.Core.Interfaces.Services;
 using System.Threading;
@@ -34,25 +37,24 @@ namespace PIMTool.Services
                 .Include(x => x.projectEmployees)
                 .ThenInclude(x => x.Employee)
                 .FirstOrDefaultAsync(cancellationToken);
+
+            if(entity == null)
+            {
+                throw new ProjectNotFoundException($"Project with id: {id} not found ", id);
+            }
+
             return entity;
         }
-        public async Task<Project?> AddAsync(Project project, CancellationToken cancellationToken = default)
-        {
-            Project project1 = new Project
-            {
-                Name = project.Name,
-            };
-            await _repository.AddAsync(project1, cancellationToken);
-            await _repository.SaveChangesAsync(cancellationToken);
-            return project;
-        }
-
 
         public async Task<string> AddAsync(AddProject addProject, CancellationToken cancellationToken = default)
         {
             var group = await _groupRepository.GetAsync(addProject.GroupId, cancellationToken);
+            if(group == null)
+            {
+                throw new GroupNotFoundException($"Group with id: {addProject.GroupId} not found", addProject.GroupId);
+            }
 
-            Project project = new Project
+            Project project = new()
             {
                 Name = addProject.Name,
                 ProjectNumber = addProject.ProjectNumber,
@@ -66,9 +68,6 @@ namespace PIMTool.Services
             await _repository.SaveChangesAsync(cancellationToken);
 
             SaveProjectEmployee(addProject.Members,project,cancellationToken);
-           
-
-
             return "Add successfull";
 
         }
@@ -76,6 +75,11 @@ namespace PIMTool.Services
         public async Task<string> UpdateAsync(UpdateProject updateProject, CancellationToken cancellationToken = default)
         { 
             var group = await _groupRepository.GetAsync(updateProject.GroupId, cancellationToken);
+
+            if (group == null)
+            {
+                throw new GroupNotFoundException($"Group with id: {updateProject.GroupId} not found", updateProject.GroupId);
+            }
 
             var project = await _repository.GetAsync(updateProject.Id, cancellationToken);
 
@@ -103,6 +107,12 @@ namespace PIMTool.Services
             {
                 var employee = await _employeeRepository.Get()
                     .Where(x => member == x.Visa).FirstOrDefaultAsync();
+
+                if(employee == null)
+                {
+                    throw new EmployeeNotFoundException($"Employee visa: {member} not found",-1, member);
+                }
+
                 ProjectEmployee projectEmployee = new ProjectEmployee
                 {
                     Project = project,
@@ -132,10 +142,23 @@ namespace PIMTool.Services
                     x.ProjectNumber == searchProject.ProjectNumber ||
                     x.Customer.Contains(searchProject.Customer) ||
                     x.Name.Contains(searchProject.ProjectName)
-                    )
-                ;
+                    );
+            return await list.OrderBy(x=> x.ProjectNumber).ToListAsync();
+        }
 
-            return await list.ToListAsync();
+        public async Task<string> Delete(List<int> ids)
+        {
+            List<Project> projects = new();
+            ids.ForEach( x =>
+            {
+                var entity = _repository.Get().Include(x => x.projectEmployees).FirstOrDefault();
+                projects.Add(entity);
+            });
+
+            _repository.Delete(projects);
+            await _repository.SaveChangesAsync();
+
+            return  "Delete successfull";
         }
     }
 

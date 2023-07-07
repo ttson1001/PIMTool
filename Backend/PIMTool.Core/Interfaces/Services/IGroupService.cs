@@ -10,7 +10,7 @@ namespace PIMTool.Core.Interfaces.Services
 {
     public interface IGroupService
     {
-        Task<String> AddAsync(AddGroup addGroup, CancellationToken cancellationToken = default);
+        Task<Boolean> AddAsync(AddGroup addGroup, CancellationToken cancellationToken = default);
 
         Task<Group?> GetAsync(int id, CancellationToken cancellationToken = default);
 

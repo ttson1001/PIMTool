@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using PIMTool.Core.Domain.Entities;
 using PIMTool.Core.Domain.Objects.Project;
 using PIMTool.Core.Interfaces.Services;
+using PIMTool.Dtos;
 using PIMTool.Dtos.ProjectDtos;
 
 namespace PIMTool.Controllers
@@ -57,6 +57,18 @@ namespace PIMTool.Controllers
             var result = await _projectService.Search(searchProject);
             return Ok(_mapper.Map<List<ProjectDto>>(result));
 
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult<String>> Delete([FromBody] DeleteProject deleteProject)
+        {
+            var result = await _projectService.Delete(deleteProject.ids);
+            return Ok(result);
+        }
+
+        private SendResponseDto SendResponseDTO(int statusCode, string message, object data)
+        {
+            return new SendResponseDto(statusCode, message, data);
         }
     }
 }

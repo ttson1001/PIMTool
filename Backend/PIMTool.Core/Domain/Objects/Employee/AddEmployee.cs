@@ -11,7 +11,7 @@ namespace PIMTool.Core.Domain.Objects.Employee
     {
         [StringLength(3, ErrorMessage = "Maximum 3 character")]
         [RegularExpression(@"^[A-Z]*$", ErrorMessage = "Just only letter")]
-        public string Visa { get; set; }
+        public string Visa { get; set; } = string.Empty;
 
         [StringLength(50, ErrorMessage = "Length maximum is 50")]
         [RegularExpression(@"^[a-zA-Z ]*$", ErrorMessage = "Just only letter")]
@@ -21,6 +21,7 @@ namespace PIMTool.Core.Domain.Objects.Employee
         [RegularExpression(@"^[a-zA-Z ]*$", ErrorMessage = "Just only letter")]
         public string LastName { get; set; } = string.Empty!;
 
+        [Required]
         public DateTime Birthday { get; set; }
 
     }

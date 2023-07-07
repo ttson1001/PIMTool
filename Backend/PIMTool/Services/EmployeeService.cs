@@ -1,8 +1,10 @@
 ﻿using PIMTool.Core.Domain.Entities;
+using PIMTool.Core.Exceptions;
 using PIMTool.Core.Domain.Objects.Employee;
 using PIMTool.Core.Interfaces.Repositories;
 using PIMTool.Core.Interfaces.Services;
 using System.Linq.Dynamic.Core;
+using PIMTool.Core.Exceptions.Employee;
 
 namespace PIMTool.Services
 {
@@ -18,16 +20,28 @@ namespace PIMTool.Services
         public async Task<Employee?> GetAsync(int id, CancellationToken cancellationToken = default)
         {
             var employee = await _repository.GetAsync(id, cancellationToken);
-            return employee;
+
+            return employee ?? throw new EmployeeNotFoundException($"Employee {id} not found", id, visa: null);
         }
 
-        public async Task<String> AddAsync(AddEmployee employee, CancellationToken cancellationToken)
+        public async Task<Boolean> AddAsync(AddEmployee employee, CancellationToken cancellationToken)
         {
-            //using (UnitOfWork unit = new())
-            //{
-            //    var b = unit.EmployeeRepository.GetAsync(1, cancellationToken);
-            //    await unit.SaveChangesAsync();
-            //}
+            if ((DateTime.Now.Year - employee.Birthday.Year) < 17)
+            {
+                throw new BirthDayException($"Birthday : {employee.Birthday} is not valid", employee.Birthday);
+            }
+
+            var checkDuplicate = _repository
+                .Get()
+                .Where(e => employee.Visa.Contains(e.Visa))
+                .FirstOrDefault();
+            if (checkDuplicate != null)
+            {
+                throw new EmployeeDuplicateVisaException($"Visa {employee.Visa} is exsit", employee.Visa);
+            }
+            bool addCheck;
+            try
+            {
                 var _employee = new Employee
                 {
                     Visa = employee.Visa,
@@ -36,18 +50,36 @@ namespace PIMTool.Services
                     Birthday = employee.Birthday
                 };
 
-            await _repository.AddAsync(_employee, cancellationToken);
-            await _repository.SaveChangesAsync(cancellationToken);
-            return "Add Successfull!!";
+                await _repository.AddAsync(_employee, cancellationToken);
+                await _repository.SaveChangesAsync(cancellationToken);
+                addCheck = true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return addCheck;
+
 
 
         }
 
         public async Task<Employee?> UpdateAsync(UpdateEmployee updateEmployee, CancellationToken cancellationToken = default)
         {
+            if ((DateTime.Now.Year - updateEmployee.Birthday.Year) < 17)
+            {
+                throw new BirthDayException($"Birthday : {updateEmployee.Birthday} is not valid", updateEmployee.Birthday);
+            }
 
             var employee = await _repository.GetAsync(updateEmployee.Id, cancellationToken);
-            employee.Visa = updateEmployee.Visa;
+            if (employee == null)
+            {
+                throw new EmployeeNotFoundException(
+                    $"Employee with id:{updateEmployee.Id} not found",
+                    updateEmployee.Id,
+                    updateEmployee.Visa);
+            }
+            //employee.Visa = updateEmployee.Visa;
             employee.FirstName = updateEmployee.FirstName;
             employee.LastName = updateEmployee.LastName;
             employee.Birthday = updateEmployee.Birthday;
@@ -55,7 +87,7 @@ namespace PIMTool.Services
             return employee;
         }
 
-        public async Task<List<Employee>?> GetAll(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Employee>?> GetAll(CancellationToken cancellationToken = default)
         {
             var employees = await _repository.GetValuesAsync(cancellationToken);
             return employees;
@@ -75,6 +107,6 @@ namespace PIMTool.Services
             return "Delete successfull";
         }
 
-       
+
     }
 }
