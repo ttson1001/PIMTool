@@ -152,6 +152,12 @@ namespace PIMTool.Services
             ids.ForEach( x =>
             {
                 var entity = _repository.Get().Include(x => x.projectEmployees).FirstOrDefault();
+
+                if(entity == null)
+                {
+                    throw new ProjectNotFoundException($"Project with id: {x} not found ", x);
+                }
+
                 projects.Add(entity);
             });
 
