@@ -27,7 +27,7 @@ namespace PIMTool.Services
                 .GetAsync(addGroup.EmployeeId, cancellationToken);
             if (employee == null)
             {
-                throw new EmployeeNotFoundException($"Employee {addGroup.EmployeeId} not found", addGroup.EmployeeId, visa: null);
+                throw new EmployeeNotFoundException($"Employee {addGroup.EmployeeId} not found", addGroup.EmployeeId);
             }
             bool addCheck;
             try
@@ -75,8 +75,7 @@ namespace PIMTool.Services
             {
                 throw new EmployeeNotFoundException(
                     $"Employee {updateGroup.GroupLeaderId} not found",
-                    updateGroup.GroupLeaderId, 
-                    "");
+                    updateGroup.GroupLeaderId);
             }
             // Find group and check not null
             var changeGroup = await _groupRepository.GetAsync(updateGroup.Id, cancellationToken);

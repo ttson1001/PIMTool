@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PIMTool.Core.Domain.Objects.Project
+namespace PIMTool.Core.Dtos.ProjectDtos.Request
 {
-    public class SearchProject
+    public class SearchProjectDto
     {
         public string? ProjectName { get; set; }
 
@@ -14,6 +14,6 @@ namespace PIMTool.Core.Domain.Objects.Project
 
         public string? Status { get; set; }
 
-        public string? Customer {get; set; }
+        public string? Customer { get; set; }
     }
 }

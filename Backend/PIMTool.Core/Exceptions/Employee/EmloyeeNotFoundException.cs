@@ -15,9 +15,11 @@ namespace PIMTool.Core.Exceptions.Employee
 
         public EmployeeNotFoundException(string message, Exception ex) : base(message, ex) { }
 
-        public EmployeeNotFoundException(string message,int employeeId, string visa) : base(message)
+        public EmployeeNotFoundException(string message,int employeeId) : base(message)
         {
             EmployeeId = employeeId;
+        } public EmployeeNotFoundException(string message,string visa) : base(message)
+        {
             Visa = visa;
         }
     }

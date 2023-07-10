@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PIMTool.Dtos.EmployeeDtos
+namespace PIMTool.Core.Dtos.EmployeeDtos
 {
     public class EmployeeDto
     {

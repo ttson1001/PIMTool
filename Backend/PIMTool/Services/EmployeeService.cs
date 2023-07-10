@@ -21,7 +21,7 @@ namespace PIMTool.Services
         {
             var employee = await _repository.GetAsync(id, cancellationToken);
 
-            return employee ?? throw new EmployeeNotFoundException($"Employee {id} not found", id, visa: null);
+            return employee ?? throw new EmployeeNotFoundException($"Employee {id} not found", id);
         }
 
         public async Task<Boolean> AddAsync(AddEmployee employee, CancellationToken cancellationToken)
@@ -76,8 +76,7 @@ namespace PIMTool.Services
             {
                 throw new EmployeeNotFoundException(
                     $"Employee with id:{updateEmployee.Id} not found",
-                    updateEmployee.Id,
-                    updateEmployee.Visa);
+                    updateEmployee.Id);
             }
             //employee.Visa = updateEmployee.Visa;
             employee.FirstName = updateEmployee.FirstName;

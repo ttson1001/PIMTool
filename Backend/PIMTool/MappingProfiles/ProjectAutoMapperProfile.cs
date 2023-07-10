@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using PIMTool.Core.Domain.Entities;
-using PIMTool.Dtos.EmployeeDtos;
-using PIMTool.Dtos.ProjectDtos;
+using PIMTool.Core.Dtos.ProjectDtos;
+using PIMTool.Core.Dtos.ProjectDtos.Request;
 
 namespace PIMTool.MappingProfiles
 {
@@ -10,6 +10,8 @@ namespace PIMTool.MappingProfiles
         public ProjectAutoMapperProfile()
         {
             CreateMap<Project, ProjectDto>();
+
+            CreateMap<UpdateProjectDto, Project>();
         }
     }
 }

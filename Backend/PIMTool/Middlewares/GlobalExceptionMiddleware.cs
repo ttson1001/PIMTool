@@ -40,7 +40,8 @@ namespace PIMTool.Middlewares
                 ex is BirthDayException ||
                 ex is EmployeeDuplicateVisaException ||
                 ex is GroupNotFoundException ||
-                ex is ProjectNotFoundException)
+                ex is ProjectNotFoundException ||
+                ex is ProjectValidateError)
             {
                 statusCode = 400;
                 Error = "Bad Request";

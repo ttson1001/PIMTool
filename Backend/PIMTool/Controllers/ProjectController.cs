@@ -2,10 +2,12 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using PIMTool.Core.Domain.Entities;
-using PIMTool.Core.Domain.Objects.Project;
 using PIMTool.Core.Interfaces.Services;
 using PIMTool.Dtos;
-using PIMTool.Dtos.ProjectDtos;
+using PIMTool.Core.Dtos.ProjectDtos;
+using PIMTool.Core.Dtos.ProjectDtos.Request;
+using PIMTool.Validations;
+using PIMTool.Core.Exceptions.Project;
 
 namespace PIMTool.Controllers
 {
@@ -37,9 +39,17 @@ namespace PIMTool.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<String>> Add(AddProject project)
+        public async Task<ActionResult<String>> Add(AddProjectDto project)
         {
-            var entity = await _projectService.AddAsync(project);
+            var validate = new ProjectDtoValidator();
+            var validationResult = validate.Validate(project);
+
+            if (!validationResult.IsValid)
+            {
+                throw new ProjectValidateError(validationResult.Errors.First().ErrorMessage);
+            }
+                var entity = await _projectService.AddAsync(project);
+
             return Ok(new SendResponseDto
             {
                 Data = entity,
@@ -49,7 +59,7 @@ namespace PIMTool.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<String>> Update(UpdateProject project)
+        public async Task<ActionResult<String>> Update(UpdateProjectDto project)
         {
             var entity = await _projectService.UpdateAsync(project);
             return Ok(new SendResponseDto
@@ -74,7 +84,7 @@ namespace PIMTool.Controllers
 
         [HttpPost]
         [Route("search")]
-        public async Task<ActionResult<List<ProjectDto>>> Fillter([FromBody] SearchProject searchProject)
+        public async Task<ActionResult<List<ProjectDto>>> Fillter([FromBody] SearchProjectDto searchProject)
         {
             var result = await _projectService.Search(searchProject);
             return Ok(new SendResponseDto
@@ -87,7 +97,7 @@ namespace PIMTool.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult<String>> Delete([FromBody] DeleteProject deleteProject)
+        public async Task<ActionResult<String>> Delete([FromBody] DeleteProjectDto deleteProject)
         {
             var result = await _projectService.Delete(deleteProject.ids);
             return Ok(new SendResponseDto

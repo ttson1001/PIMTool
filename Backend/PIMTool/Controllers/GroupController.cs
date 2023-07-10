@@ -6,7 +6,7 @@ using PIMTool.Core.Domain.Objects.Group;
 using PIMTool.Core.Exceptions.Group;
 using PIMTool.Core.Interfaces.Services;
 using PIMTool.Dtos;
-using PIMTool.Dtos.GroupDtos;
+using PIMTool.Core.Dtos.GroupDtos;
 using System.ComponentModel.DataAnnotations;
 
 namespace PIMTool.Controllers

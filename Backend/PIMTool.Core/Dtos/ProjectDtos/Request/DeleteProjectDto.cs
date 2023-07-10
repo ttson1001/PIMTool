@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PIMTool.Core.Domain.Objects.Project
+namespace PIMTool.Core.Dtos.ProjectDtos.Request
 {
-    public class DeleteProject
+    public class DeleteProjectDto
     {
-        public List<int> ids { get; set; }
+        public List<int> ids { get; set; } = null!;
     }
 }
+

@@ -1,4 +1,4 @@
-﻿namespace PIMTool.Dtos.ProjectDtos;
+﻿namespace PIMTool.Core.Dtos.ProjectDtos;
 
 public class ProjectDto
 {

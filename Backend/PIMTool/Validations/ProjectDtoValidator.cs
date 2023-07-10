@@ -1,6 +1,6 @@
 ﻿
 using FluentValidation;
-using PIMTool.Dtos.ProjectDtos.Request;
+using PIMTool.Core.Dtos.ProjectDtos.Request;
 
 namespace PIMTool.Validations
 {
@@ -11,8 +11,13 @@ namespace PIMTool.Validations
             RuleFor(dto => dto.Name).NotEmpty();
             RuleFor(dto => dto.ProjectNumber)
                 .Must(x => x.ToString().Length < 4)
-                .WithMessage("Lỗi rồi");
-            
+                .WithMessage("Project");
+            RuleFor(dto => dto.Status).NotEmpty()
+                .MaximumLength(3)
+                .WithMessage("Status must 3 letter no than more");
+            RuleFor(dto => dto.Customer).NotEmpty();
+            RuleFor(dto => dto.GroupId).NotEmpty();
+            RuleFor(dto => dto.Members).NotEmpty();
 
         }
     }

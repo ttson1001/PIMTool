@@ -1,4 +1,4 @@
-﻿namespace PIMTool.Dtos.ProjectDtos.Request
+﻿namespace PIMTool.Core.Dtos.ProjectDtos.Request
 {
     public class AddProjectDto
     {
@@ -6,9 +6,9 @@
 
         public int ProjectNumber { get; set; }
 
-        public string Customer { get; set; }
+        public string Customer { get; set; } = null!;
 
-        public string Status { get; set; }
+        public string Status { get; set; } = null!;
 
         public DateTime StartDate { get; set; }
 
@@ -16,6 +16,6 @@
 
         public int GroupId { get; set; }
 
-        public String Members { get; set; }
+        public String Members { get; set; }= null!;
     }
 }

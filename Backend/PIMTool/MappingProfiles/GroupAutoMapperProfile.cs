@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using PIMTool.Core.Domain.Entities;
-using PIMTool.Dtos.GroupDtos;
+using PIMTool.Core.Dtos.GroupDtos;
 
 namespace PIMTool.MappingProfiles
 {

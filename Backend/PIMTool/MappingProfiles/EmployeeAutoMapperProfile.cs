@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using PIMTool.Core.Domain.Entities;
 using PIMTool.Dtos;
-using PIMTool.Dtos.EmployeeDtos;
+using PIMTool.Core.Dtos.EmployeeDtos;
 
 namespace PIMTool.MappingProfiles
 {

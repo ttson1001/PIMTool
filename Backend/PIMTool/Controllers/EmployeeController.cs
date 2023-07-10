@@ -1,14 +1,12 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+
 using Microsoft.AspNetCore.Mvc;
-using PIMTool.Core.Domain.Entities;
+
 using PIMTool.Core.Domain.Objects.Employee;
-using PIMTool.Core.Exceptions.Employee;
+
 using PIMTool.Core.Interfaces.Services;
 using PIMTool.Dtos;
-using PIMTool.Dtos.EmployeeDtos;
-using PIMTool.Dtos.GroupDtos;
+using PIMTool.Core.Dtos.EmployeeDtos;
 using System.ComponentModel.DataAnnotations;
 
 namespace PIMTool.Controllers
