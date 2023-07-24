@@ -4,14 +4,14 @@ using PIMTool.Core.Dtos.ProjectDtos.Request;
 
 namespace PIMTool.Validations
 {
-    public class ProjectDtoValidator : AbstractValidator<AddProjectDto>
+    public class ProjectDtoValidator : AbstractValidator<RequestProjectDto>
     {
         public ProjectDtoValidator()
         {
             RuleFor(dto => dto.Name).NotEmpty();
             RuleFor(dto => dto.ProjectNumber)
-                .Must(x => x.ToString().Length < 4)
-                .WithMessage("Project");
+                .Must(x => x.ToString().Length <= 4)
+                .WithMessage("Project Number must be 4 number");
             RuleFor(dto => dto.Status).NotEmpty()
                 .MaximumLength(3)
                 .WithMessage("Status must 3 letter no than more");

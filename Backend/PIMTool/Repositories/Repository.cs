@@ -41,6 +41,11 @@ namespace PIMTool.Repositories
             await _set.AddAsync(entity, cancellationToken);
         }
 
+        public void Update (T entity)
+        {
+             _set.Update(entity);
+        }
+
         public void Delete(List<T> entities)
         {
             _set.RemoveRange(entities);
@@ -51,5 +56,9 @@ namespace PIMTool.Repositories
             await _pimContext.SaveChangesAsync(cancellationToken);
         }
 
+        public void ClearChangeTracking()
+        {
+            _pimContext.ChangeTracker.Clear();
+        }
     }
 }

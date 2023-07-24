@@ -42,7 +42,7 @@ namespace PIMTool.Services
             bool addCheck;
             try
             {
-                var _employee = new Employee
+                var newEmployee = new Employee
                 {
                     Visa = employee.Visa,
                     FirstName = employee.FirstName,
@@ -50,7 +50,7 @@ namespace PIMTool.Services
                     Birthday = employee.Birthday
                 };
 
-                await _repository.AddAsync(_employee, cancellationToken);
+                await _repository.AddAsync(newEmployee, cancellationToken);
                 await _repository.SaveChangesAsync(cancellationToken);
                 addCheck = true;
             }
@@ -59,11 +59,8 @@ namespace PIMTool.Services
                 throw;
             }
             return addCheck;
-
-
-
         }
-
+        // combine add vs update
         public async Task<Employee?> UpdateAsync(UpdateEmployee updateEmployee, CancellationToken cancellationToken = default)
         {
             if ((DateTime.Now.Year - updateEmployee.Birthday.Year) < 17)
@@ -79,6 +76,7 @@ namespace PIMTool.Services
                     updateEmployee.Id);
             }
             //employee.Visa = updateEmployee.Visa;
+            // use auto mapper
             employee.FirstName = updateEmployee.FirstName;
             employee.LastName = updateEmployee.LastName;
             employee.Birthday = updateEmployee.Birthday;

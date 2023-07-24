@@ -1,17 +1,15 @@
 ﻿using AutoMapper;
-
 using Microsoft.AspNetCore.Mvc;
-
 using PIMTool.Core.Domain.Objects.Employee;
-
 using PIMTool.Core.Interfaces.Services;
 using PIMTool.Dtos;
 using PIMTool.Core.Dtos.EmployeeDtos;
 using System.ComponentModel.DataAnnotations;
+using PIMTool.Core.Constants;
 
 namespace PIMTool.Controllers
 {
-    [Route("employee")]
+    [Route(Constants.EmployeeRoute)]
     [ApiController]
     public class EmployeeController : ControllerBase
     {
@@ -38,7 +36,7 @@ namespace PIMTool.Controllers
 
         }
 
-        [HttpGet("{id}")]
+        [HttpGet(Constants.GetId)]
         public async Task<ActionResult<SendResponseDto>> Get([FromRoute][Required] int id)
         {
             var entity = await _employeeService.GetAsync(id);

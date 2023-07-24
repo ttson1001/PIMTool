@@ -29,30 +29,21 @@ namespace PIMTool.Services
             {
                 throw new EmployeeNotFoundException($"Employee {addGroup.EmployeeId} not found", addGroup.EmployeeId);
             }
-            bool addCheck;
-            try
+            var newGroup = new Group
             {
-                var newGroup = new Group
-                {
-                    Employee = employee
-                };
+                Employee = employee
+            };
 
-                await _groupRepository.AddAsync(newGroup, cancellationToken);
-                await _groupRepository.SaveChangesAsync(cancellationToken);
-                addCheck = true;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return addCheck;
+            await _groupRepository.AddAsync(newGroup, cancellationToken);
+            await _groupRepository.SaveChangesAsync(cancellationToken);
+
+            return true;
 
         }
 
         public async Task<List<Group>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var entity = await _groupRepository.Get().Include(x => x.Employee).ToListAsync(cancellationToken);
-            return entity;
+            return await _groupRepository.Get().Include(x => x.Employee).ToListAsync(cancellationToken); ;
         }
 
         public async Task<Group?> GetAsync(int id, CancellationToken cancellationToken = default)
@@ -79,7 +70,7 @@ namespace PIMTool.Services
             }
             // Find group and check not null
             var changeGroup = await _groupRepository.GetAsync(updateGroup.Id, cancellationToken);
-            if(changeGroup == null)
+            if (changeGroup == null)
             {
                 throw new GroupNotFoundException(
                     $"Group with id: {updateGroup.Id} not found",

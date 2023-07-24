@@ -1,17 +1,15 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PIMTool.Core.Domain.Entities;
 using PIMTool.Core.Domain.Objects.Group;
-using PIMTool.Core.Exceptions.Group;
 using PIMTool.Core.Interfaces.Services;
 using PIMTool.Dtos;
 using PIMTool.Core.Dtos.GroupDtos;
 using System.ComponentModel.DataAnnotations;
+using PIMTool.Core.Constants;
 
 namespace PIMTool.Controllers
 {
-    [Route("groups")]
+    [Route(Constants.GroupsRoute)]
     [ApiController]
     public class GroupController : ControllerBase
     {
@@ -24,7 +22,7 @@ namespace PIMTool.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet(Constants.GetId)]
         public async Task<ActionResult<GroupDto>> Get([FromRoute][Required] int id)
         {
             var entity = await _groupService.GetAsync(id);
@@ -66,7 +64,7 @@ namespace PIMTool.Controllers
 
         [HttpGet]
 
-        public async Task<ActionResult<List<Group>>> GetAll()
+        public async Task<ActionResult<List<GroupDto>>> GetAll()
         {
             var response = await _groupService.GetAllAsync();
            
@@ -74,7 +72,7 @@ namespace PIMTool.Controllers
              {
                  StatusCode = 200,
                  Message = "Get All Group successful",
-                 Data = _mapper.Map<GroupDto>(_mapper.Map<List<GroupDto>>(response))
+                 Data = _mapper.Map<List<GroupDto>>(response)
              });
         }
     }

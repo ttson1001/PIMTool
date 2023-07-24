@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace PIMTool.Core.Dtos.ProjectDtos.Request
 {
-    public class UpdateProjectDto
+    public class RequestProjectDto
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;
+        public int ProjectNumber { get; set; }
 
         public string Customer { get; set; } = null!;
 
@@ -17,10 +18,10 @@ namespace PIMTool.Core.Dtos.ProjectDtos.Request
 
         public DateTime StartDate { get; set; }
 
-        public DateTime EndDate { get; set; }
+        public DateTime ?EndDate { get; set; }
 
         public int GroupId { get; set; }
 
-        public String Members { get; set; }= null!;
+        public string ?Members { get; set; }
     }
 }

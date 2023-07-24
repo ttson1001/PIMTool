@@ -7,7 +7,6 @@ using PIMTool.Core.Exceptions.Group;
 using PIMTool.Core.Exceptions.Project;
 using PIMTool.Core.Interfaces.Repositories;
 using PIMTool.Core.Interfaces.Services;
-using System.Threading;
 
 namespace PIMTool.Services
 {
@@ -43,80 +42,88 @@ namespace PIMTool.Services
                 .ThenInclude(x => x.Employee)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if(entity == null)
+            if (null == entity)
             {
                 throw new ProjectNotFoundException($"Project with id: {id} not found ", id);
             }
-
             return entity;
         }
 
-        public async Task<string> AddAsync(AddProjectDto addProject, CancellationToken cancellationToken = default)
+        public async Task<Boolean> AddAsync(RequestProjectDto projectAddDto, CancellationToken cancellationToken = default)
         {
-            var group = await _groupRepository.GetAsync(addProject.GroupId, cancellationToken);
-            if(group == null)
+            var group = await _groupRepository.GetAsync(projectAddDto.GroupId, cancellationToken);
+            if (null == group)
             {
-                throw new GroupNotFoundException($"Group with id: {addProject.GroupId} not found", addProject.GroupId);
+                throw new GroupNotFoundException($"Group with id: {projectAddDto.GroupId} not found", projectAddDto.GroupId);
             }
-
-            Project project = new()
+            var checkPojectNumber = _repository.Get().Where(x => x.ProjectNumber == projectAddDto.ProjectNumber).SingleOrDefault();
+            if (checkPojectNumber != null)
             {
-                Name = addProject.Name,
-                ProjectNumber = addProject.ProjectNumber,
-                Customer = addProject.Customer,
-                Group = group,
-                Status = addProject.Status,
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now,
-            };
+                throw new ProjectDupicateNumberException($"Project number {projectAddDto.ProjectNumber} is dupplicate");
+            }
+            var project = _mapper.Map<Project>(projectAddDto);
+            project.Group = group;
             await _repository.AddAsync(project, cancellationToken);
             await _repository.SaveChangesAsync(cancellationToken);
+            _repository.ClearChangeTracking();
 
-            SaveProjectEmployee(addProject.Members,project,cancellationToken);
-            return "Add successfull";
+            if (null != projectAddDto.Members)
+            {
+                await SaveProjectEmployee(projectAddDto.Members, projectAddDto.ProjectNumber, cancellationToken);
+            }
+            return true;
 
         }
 
-        public async Task<string> UpdateAsync(UpdateProjectDto updateProject, CancellationToken cancellationToken = default)
-        { 
-            var group = await _groupRepository.GetAsync(updateProject.GroupId, cancellationToken);
+        public async Task<Project?> UpdateAsync(RequestProjectDto ProjectUpdateDto, CancellationToken cancellationToken = default)
+        {
+            var group = await _groupRepository.GetAsync(ProjectUpdateDto.GroupId, cancellationToken);
 
-            if (group == null)
+            if (null == group)
             {
-                throw new GroupNotFoundException($"Group with id: {updateProject.GroupId} not found", updateProject.GroupId);
+                throw new GroupNotFoundException($"Group with id: {ProjectUpdateDto.GroupId} not found", ProjectUpdateDto.GroupId);
             }
-            var project = _mapper.Map<Project>(updateProject);
 
+            var project = await _repository.GetAsync(ProjectUpdateDto.Id, cancellationToken);
+
+            if (null == project)
+            {
+                throw new ProjectNotFoundException($"Project with id: {ProjectUpdateDto.Id} not found ", ProjectUpdateDto.Id);
+            }
+
+            _mapper.Map(ProjectUpdateDto, project);
+            _repository.Update(project);
             await _repository.SaveChangesAsync(cancellationToken);
 
-            var listProject = await _projectEmployeeRepository.Get().Where(x => x.Id == updateProject.Id).ToListAsync();
+            var listProject = await _projectEmployeeRepository.Get().Where(x => x.ProjectId == ProjectUpdateDto.Id).ToListAsync();
             _projectEmployeeRepository.Delete(listProject);
 
-            SaveProjectEmployee(updateProject.Members, project, cancellationToken);
+            if (null != ProjectUpdateDto.Members)
+            {
+                await SaveProjectEmployee(ProjectUpdateDto.Members, ProjectUpdateDto.ProjectNumber, cancellationToken);
+            }
 
-            return "Update Successfull";
-
+            return await _repository.GetAsync(ProjectUpdateDto.Id, cancellationToken);
         }
-        private async void SaveProjectEmployee(String members, Project project, CancellationToken cancellationToken = default)
+
+        private async Task SaveProjectEmployee(String members, int projectNumber, CancellationToken cancellationToken = default)
         {
             string[] Visas = members.Split(",");
+            var project = _repository.Get().Where(x => x.ProjectNumber == projectNumber).SingleOrDefault();
             foreach (string member in Visas)
             {
                 await Console.Out.WriteLineAsync(member);
                 var employee = await _employeeRepository.Get()
-                    .Where(x => member == x.Visa).FirstOrDefaultAsync();
-
-                if(employee == null)
+                    .Where(x => member.Equals(x.Visa)).FirstOrDefaultAsync();
+                if (null == employee)
                 {
                     throw new EmployeeNotFoundException($"Employee visa: {member} not found", member);
                 }
-
-                ProjectEmployee projectEmployee = new ProjectEmployee
+                ProjectEmployee projectEmployee = new()
                 {
                     Project = project,
                     Employee = employee
                 };
-
                 await _projectEmployeeRepository.AddAsync(projectEmployee, cancellationToken);
                 await _projectEmployeeRepository.SaveChangesAsync(cancellationToken);
             }
@@ -124,45 +131,52 @@ namespace PIMTool.Services
 
         public async Task<List<Project>?> GetAll(CancellationToken cancellationToken = default)
         {
-            var list = await _repository.GetValuesAsync(cancellationToken);
-
-            return list;
+            return await _repository.GetValuesAsync(cancellationToken);
         }
 
-        public async Task<List<Project>?> Search(SearchProjectDto searchProject, CancellationToken cancellationToken = default)
+        public async Task<List<Project>?> Search(ProjectSearchDto searchProject, CancellationToken cancellationToken = default)
         {
-            var list =  _repository.Get();
+            var query = _repository.Get();
             if (searchProject.Status != null)
             {
-                list.Where(x => x.Status.Contains(searchProject.Status));
+                query = query.Where(x => x.Status.Contains(searchProject.Status));
             }
-            list.Where(x =>
-                    x.ProjectNumber == searchProject.ProjectNumber ||
-                    x.Customer.Contains(searchProject.Customer) ||
-                    x.Name.Contains(searchProject.ProjectName)
-                    );
-            return await list.OrderBy(x=> x.ProjectNumber).ToListAsync();
+            if (searchProject.SearchValue != null)
+            {
+                query = query.Where(x =>
+                        x.ProjectNumber.ToString() == searchProject.SearchValue ||
+                        x.Customer.Contains(searchProject.SearchValue) ||
+                        x.Name.Contains(searchProject.SearchValue)
+                     );
+            }
+            return await query.OrderBy(x => x.ProjectNumber).ToListAsync(); ;
         }
 
-        public async Task<string> Delete(List<int> ids)
+        public async Task<Boolean> Delete(List<int> ids)
         {
             List<Project> projects = new();
-            ids.ForEach( x =>
+            ids.ForEach(x =>
             {
                 var entity = _repository.Get().Include(x => x.projectEmployees).FirstOrDefault();
-
-                if(entity == null)
+                if (null == entity)
                 {
                     throw new ProjectNotFoundException($"Project with id: {x} not found ", x);
                 }
-
                 projects.Add(entity);
             });
-
             _repository.Delete(projects);
             await _repository.SaveChangesAsync();
+            return true;
+        }
 
-            return  "Delete successfull";
+        public Boolean CheckProjectNumber(int projectNumber)
+        {
+            var project = _repository.Get().Where(x => x.ProjectNumber == projectNumber).FirstOrDefault();
+            if (null == project)
+            {
+                return true;
+            }
+            return false;
         }
     }
 

@@ -26,21 +26,21 @@ namespace PIMTool.Database
                     entity.ToTable("EMPLOYEE");
                     entity.HasKey(e => e.Id);
                     entity.Property(e => e.Id)
-                    .HasColumnName("ID");
+                        .HasColumnName("ID");
                     entity.Property(e => e.Visa)
-                    .HasColumnName("VISA")
-                    .HasMaxLength(3);
+                        .HasColumnName("VISA")
+                        .HasMaxLength(3);
                     entity.Property(e => e.FirstName)
-                    .HasColumnName("FIRST_NAME")
-                    .HasMaxLength(50);
+                        .HasColumnName("FIRST_NAME")
+                        .HasMaxLength(50);
                     entity.Property(e => e.LastName)
-                    .HasColumnName("LAST_NAME")
-                    .HasMaxLength(50);
+                        .HasColumnName("LAST_NAME")
+                        .HasMaxLength(50);
                     entity.Property(e => e.Birthday)
-                    .HasColumnName("BIRTH_DATE");
+                        .HasColumnName("BIRTH_DATE");
                     entity.Property(e => e.Version)
-                    .HasColumnName("VERSION")
-                    .IsRowVersion();
+                        .HasColumnName("VERSION")
+                        .IsRowVersion();
                 }
             );
 
@@ -50,15 +50,15 @@ namespace PIMTool.Database
                     entity.ToTable("GROUP");
                     entity.HasKey(e => e.Id);
                     entity.Property(e => e.Id)
-                    .HasColumnName("ID");
+                        .HasColumnName("ID");
                     entity.Property(e => e.GroupLeaderId)
-                    .HasColumnName("GROUP_LEADER_ID");
+                        .HasColumnName("GROUP_LEADER_ID");
                     entity.HasOne(g => g.Employee)
-                    .WithOne(e => e.Group)
-                    .HasForeignKey<Group>(e => e.GroupLeaderId);
+                        .WithOne(e => e.Group)
+                        .HasForeignKey<Group>(e => e.GroupLeaderId);
                     entity.Property(e => e.Version)
-                    .HasColumnName("VERSION")
-                    .IsRowVersion();
+                        .HasColumnName("VERSION")
+                        .IsRowVersion();
                 }
                 );
 
@@ -66,30 +66,30 @@ namespace PIMTool.Database
                 entity =>
                 {
                     entity.ToTable("PROJECT")
-                    .HasKey(e => e.Id);
+                        .HasKey(e => e.Id);
                     entity.Property(e => e.Id)
-                    .HasColumnName("ID");
+                        .HasColumnName("ID");
                     entity.Property(e => e.ProjectNumber)
-                    .HasColumnName("PROJECT_NUMBER");
+                        .HasColumnName("PROJECT_NUMBER");
                     entity.Property(e => e.Name)
-                    .HasColumnName("NAME")
-                    .HasMaxLength(50);
+                        .HasColumnName("NAME")
+                        .HasMaxLength(50);
                     entity.Property(e => e.Customer)
-                    .HasColumnName("CUSTOMER")
-                    .HasMaxLength(50);
+                        .HasColumnName("CUSTOMER")
+                        .HasMaxLength(50);
                     entity.Property(e => e.Status)
-                    .HasColumnName("STATUS")
-                    .HasMaxLength(3);
+                        .HasColumnName("STATUS")
+                        .HasMaxLength(3);
                     entity.Property(e => e.StartDate)
-                    .HasColumnName("START_DATE");
+                        .HasColumnName("START_DATE");
                     entity.Property(e => e.EndDate)
-                    .HasColumnName("END_DATE");
+                        .HasColumnName("END_DATE");
                     entity.HasOne<Group>(e => e.Group)
-                    .WithMany(p => p.Projects)
-                    .HasForeignKey(p => p.GroupId);
+                        .WithMany(p => p.Projects)
+                        .HasForeignKey(p => p.GroupId);
                     entity.Property(e => e.Version)
-                    .HasColumnName("VERSION")
-                    .IsRowVersion();
+                        .HasColumnName("VERSION")
+                        .IsRowVersion();
                 }
                 );
 
@@ -98,17 +98,17 @@ namespace PIMTool.Database
                 {
                     entity.ToTable("PROJECT_EMPLOYEE");
                     entity.Property(e => e.ProjectId)
-                    .HasColumnName("PROJECT_ID");
+                        .HasColumnName("PROJECT_ID");
                     entity.Property(e => e.EmployeeId)
-                    .HasColumnName("EMPLOYEE_ID");
+                        .HasColumnName("EMPLOYEE_ID");
                     entity.Ignore(e => e.Id);
                     entity.HasKey(e => new { e.ProjectId, e.EmployeeId });
                     entity.HasOne(e => e.Employee)
-                    .WithMany(p => p.ProjectEmployees)
-                    .HasForeignKey(p => p.EmployeeId);
+                        .WithMany(p => p.ProjectEmployees)
+                        .HasForeignKey(p => p.EmployeeId);
                     entity.HasOne(e => e.Project)
-                    .WithMany(p => p.projectEmployees)
-                    .HasForeignKey(p => p.ProjectId);
+                        .WithMany(p => p.projectEmployees)
+                        .HasForeignKey(p => p.ProjectId);
 
                 }
                 );

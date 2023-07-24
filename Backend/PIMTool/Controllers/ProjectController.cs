@@ -1,18 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using PIMTool.Core.Domain.Entities;
 using PIMTool.Core.Interfaces.Services;
 using PIMTool.Dtos;
 using PIMTool.Core.Dtos.ProjectDtos;
 using PIMTool.Core.Dtos.ProjectDtos.Request;
 using PIMTool.Validations;
 using PIMTool.Core.Exceptions.Project;
+using Microsoft.AspNetCore.Cors;
+using PIMTool.Core.Constants;
 
 namespace PIMTool.Controllers
 {
     [ApiController]
-    [Route("projects")]
+    [Route(Constants.ProjectsRoute)]
+    [EnableCors]
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
@@ -25,7 +27,7 @@ namespace PIMTool.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet(Constants.GetId)]
         public async Task<ActionResult<ProjectDto>> Get([FromRoute][Required] int id)
         {
             var entity = await _projectService.GetAsync(id);
@@ -39,7 +41,7 @@ namespace PIMTool.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<String>> Add(AddProjectDto project)
+        public async Task<ActionResult<String>> Add(RequestProjectDto project)
         {
             var validate = new ProjectDtoValidator();
             var validationResult = validate.Validate(project);
@@ -48,7 +50,7 @@ namespace PIMTool.Controllers
             {
                 throw new ProjectValidateError(validationResult.Errors.First().ErrorMessage);
             }
-                var entity = await _projectService.AddAsync(project);
+            var entity = await _projectService.AddAsync(project);
 
             return Ok(new SendResponseDto
             {
@@ -59,12 +61,12 @@ namespace PIMTool.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<String>> Update(UpdateProjectDto project)
+        public async Task<ActionResult<ProjectDto>> Update(RequestProjectDto project)
         {
             var entity = await _projectService.UpdateAsync(project);
             return Ok(new SendResponseDto
             {
-                Data = entity,
+                Data = _mapper.Map<ProjectDto>(entity),
                 Message = $"Update Project successfull",
                 StatusCode = 200
             });
@@ -84,7 +86,7 @@ namespace PIMTool.Controllers
 
         [HttpPost]
         [Route("search")]
-        public async Task<ActionResult<List<ProjectDto>>> Fillter([FromBody] SearchProjectDto searchProject)
+        public async Task<ActionResult<List<ProjectDto>>> Fillter([FromBody] ProjectSearchDto searchProject)
         {
             var result = await _projectService.Search(searchProject);
             return Ok(new SendResponseDto
@@ -97,9 +99,21 @@ namespace PIMTool.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult<String>> Delete([FromBody] DeleteProjectDto deleteProject)
+        public async Task<ActionResult<String>> Delete([FromBody] ProjectDeleteDto deleteProject)
         {
-            var result = await _projectService.Delete(deleteProject.ids);
+            var result = await _projectService.Delete(deleteProject.Ids);
+            return Ok(new SendResponseDto
+            {
+                Data = result,
+                Message = "Delete project successfull",
+                StatusCode = 200
+            });
+        }
+
+        [HttpGet("check-project-number/{projectNumber}")]
+        public ActionResult<Boolean> CheckProjectNumber(int projectNumber)
+        {
+            var result = _projectService.CheckProjectNumber(projectNumber);
             return Ok(new SendResponseDto
             {
                 Data = result,

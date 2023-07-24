@@ -9,10 +9,6 @@ namespace PIMTool.Test
 {
     public abstract class BaseTest
     {
-        //private static DbContextOptions<PimContext> dbContextOptions = new DbContextOptionsBuilder<PimContext>()
-        //      .UseInMemoryDatabase(databaseName: "PIMDBTest")
-        //      .Options;
-        //public PimContext context;
         protected PimContext Context { get; private set; } = null!;
         protected IServiceProvider ServiceProvider { get; private set; } = null!;
 
@@ -32,7 +28,6 @@ namespace PIMTool.Test
         {
             Context.Dispose();
         }
-
 
         private void SeedDatabase()
         {

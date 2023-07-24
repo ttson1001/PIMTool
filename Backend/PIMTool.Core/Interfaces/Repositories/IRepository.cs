@@ -12,7 +12,11 @@ namespace PIMTool.Core.Interfaces.Repositories
 
         Task AddAsync(T entity, CancellationToken cancellationToken = default);
 
+        void Update(T entity);
+
         void Delete(List<T> entities);
+
+        void ClearChangeTracking();
 
         Task SaveChangesAsync(CancellationToken cancellationToken = default);
         Task<List<T>?> GetValuesAsync(CancellationToken cancellationToken = default);

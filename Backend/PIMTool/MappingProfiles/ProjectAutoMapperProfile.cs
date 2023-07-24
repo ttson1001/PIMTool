@@ -9,9 +9,13 @@ namespace PIMTool.MappingProfiles
     {
         public ProjectAutoMapperProfile()
         {
-            CreateMap<Project, ProjectDto>();
 
-            CreateMap<UpdateProjectDto, Project>();
+            CreateMap<Project, ProjectDto>()
+            .ForMember(dest => dest.EmployeeDto, opt => opt.MapFrom(src => src.projectEmployees.Select(pe => pe.Employee)));
+
+
+            CreateMap<RequestProjectDto, Project>()
+                .ForMember(dest => dest.GroupId, opt => opt.Ignore());
         }
     }
 }

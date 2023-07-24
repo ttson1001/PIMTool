@@ -14,9 +14,5 @@ namespace PIMTool.Services
             _repository = repository;
         }
 
-        public Task<string> AddAsync(AddProjectEmployee addProjectEmployee, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
