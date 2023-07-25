@@ -18,10 +18,12 @@ namespace PIMTool.Core.Dtos.ProjectDtos.Request
 
         public DateTime StartDate { get; set; }
 
-        public DateTime ?EndDate { get; set; }
+        public DateTime? EndDate { get; set; } 
 
         public int GroupId { get; set; }
 
         public string ?Members { get; set; }
+
+        public byte[]? Version { get; set; }
     }
 }

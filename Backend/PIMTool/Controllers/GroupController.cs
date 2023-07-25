@@ -15,7 +15,6 @@ namespace PIMTool.Controllers
     {
         private readonly IGroupService _groupService;
         private readonly IMapper _mapper;
-
         public GroupController(IGroupService groupService, IMapper mapper)
         {
             _groupService = groupService;
@@ -32,7 +31,6 @@ namespace PIMTool.Controllers
                 Message = "Find successful",
                 Data = _mapper.Map<GroupDto>(entity)
             });
-
         }
 
         [HttpPost]
@@ -45,7 +43,6 @@ namespace PIMTool.Controllers
                 Message = "Add Group successful",
                 Data = entity
             });
-
         }
 
         [HttpPut]
@@ -59,11 +56,9 @@ namespace PIMTool.Controllers
                 Message = "Update Group successful",
                 Data = _mapper.Map<GroupDto>(entity)
             });
-
         }
 
         [HttpGet]
-
         public async Task<ActionResult<List<GroupDto>>> GetAll()
         {
             var response = await _groupService.GetAllAsync();

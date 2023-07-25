@@ -10,13 +10,7 @@ namespace PIMTool.Database
 
         public DbSet<Employee> Employees { get; set; } = null!;
 
-        public PimContext(DbContextOptions options) : base(options)
-        {
-        }
-
-        public PimContext()
-        {
-        }
+        public PimContext(DbContextOptions options) : base(options){}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -98,7 +98,7 @@ namespace PIMTool.Services
                 Employees.Add(_repository.Get().Where(i => i.Id == x).First());
             });
 
-            _repository.Delete(Employees);
+            _repository.DeleteRange(Employees);
             _repository.SaveChangesAsync();
 
             return "Delete successfull";

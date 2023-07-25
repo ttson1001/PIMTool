@@ -18,6 +18,7 @@ namespace PIMTool.Core.Dtos.ProjectDtos
         public string Status { get; set; } = null!;
         public string Customer { get; set; } = null!;
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; } = null ;
+        public byte[]? Version { get; set; }
     }
 }

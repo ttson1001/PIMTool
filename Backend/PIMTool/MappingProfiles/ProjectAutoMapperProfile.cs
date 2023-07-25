@@ -9,7 +9,6 @@ namespace PIMTool.MappingProfiles
     {
         public ProjectAutoMapperProfile()
         {
-
             CreateMap<Project, ProjectDto>()
             .ForMember(dest => dest.EmployeeDto, opt => opt.MapFrom(src => src.projectEmployees.Select(pe => pe.Employee)));
 

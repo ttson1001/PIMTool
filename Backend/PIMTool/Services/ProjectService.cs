@@ -51,32 +51,47 @@ namespace PIMTool.Services
 
         public async Task<Boolean> AddAsync(RequestProjectDto projectAddDto, CancellationToken cancellationToken = default)
         {
+            List<Employee>? Employees = null;
+            if (projectAddDto.Members != null)
+            {
+                Employees = await CheckEmployee(projectAddDto.Members);
+            }
+
             var group = await _groupRepository.GetAsync(projectAddDto.GroupId, cancellationToken);
+
             if (null == group)
             {
                 throw new GroupNotFoundException($"Group with id: {projectAddDto.GroupId} not found", projectAddDto.GroupId);
             }
+
             var checkPojectNumber = _repository.Get().Where(x => x.ProjectNumber == projectAddDto.ProjectNumber).SingleOrDefault();
+
             if (checkPojectNumber != null)
             {
                 throw new ProjectDupicateNumberException($"Project number {projectAddDto.ProjectNumber} is dupplicate");
             }
+            // add Project
             var project = _mapper.Map<Project>(projectAddDto);
             project.Group = group;
             await _repository.AddAsync(project, cancellationToken);
             await _repository.SaveChangesAsync(cancellationToken);
-            _repository.ClearChangeTracking();
-
-            if (null != projectAddDto.Members)
+            if(Employees != null)
             {
-                await SaveProjectEmployee(projectAddDto.Members, projectAddDto.ProjectNumber, cancellationToken);
+                await SaveProjectEmployee(Employees, projectAddDto.ProjectNumber, cancellationToken);
             }
+          
             return true;
 
         }
 
         public async Task<Project?> UpdateAsync(RequestProjectDto ProjectUpdateDto, CancellationToken cancellationToken = default)
         {
+            List<Employee>? Employees = null;
+            if (ProjectUpdateDto.Members != null)
+            {
+                Employees = await CheckEmployee(ProjectUpdateDto.Members);
+            }
+
             var group = await _groupRepository.GetAsync(ProjectUpdateDto.GroupId, cancellationToken);
 
             if (null == group)
@@ -85,10 +100,16 @@ namespace PIMTool.Services
             }
 
             var project = await _repository.GetAsync(ProjectUpdateDto.Id, cancellationToken);
+ 
 
             if (null == project)
             {
                 throw new ProjectNotFoundException($"Project with id: {ProjectUpdateDto.Id} not found ", ProjectUpdateDto.Id);
+            }
+
+            if (!project.Version.SequenceEqual(ProjectUpdateDto.Version))
+            {
+                throw new Exception("Lỗi rồi bà con ơi");
             }
 
             _mapper.Map(ProjectUpdateDto, project);
@@ -96,37 +117,49 @@ namespace PIMTool.Services
             await _repository.SaveChangesAsync(cancellationToken);
 
             var listProject = await _projectEmployeeRepository.Get().Where(x => x.ProjectId == ProjectUpdateDto.Id).ToListAsync();
-            _projectEmployeeRepository.Delete(listProject);
+            _projectEmployeeRepository.DeleteRange(listProject);
 
-            if (null != ProjectUpdateDto.Members)
+            if (Employees != null)
             {
-                await SaveProjectEmployee(ProjectUpdateDto.Members, ProjectUpdateDto.ProjectNumber, cancellationToken);
+                await SaveProjectEmployee(Employees, ProjectUpdateDto.ProjectNumber, cancellationToken);
             }
 
             return await _repository.GetAsync(ProjectUpdateDto.Id, cancellationToken);
         }
 
-        private async Task SaveProjectEmployee(String members, int projectNumber, CancellationToken cancellationToken = default)
+        private async Task SaveProjectEmployee(List<Employee> employees, int projectNumber, CancellationToken cancellationToken = default)
         {
-            string[] Visas = members.Split(",");
             var project = _repository.Get().Where(x => x.ProjectNumber == projectNumber).SingleOrDefault();
+            foreach (Employee member in employees)
+            {
+                ProjectEmployee projectEmployee = new()
+                {
+                    Project = project,
+                    Employee = member
+                };
+                await _projectEmployeeRepository.AddAsync(projectEmployee, cancellationToken);
+                await _projectEmployeeRepository.SaveChangesAsync(cancellationToken);
+            }
+        }
+
+        private async Task<List<Employee>> CheckEmployee(String members)
+        {
+            List<Employee> employees = new List<Employee>();
+            string[] Visas = members.Split(",");
             foreach (string member in Visas)
             {
-                await Console.Out.WriteLineAsync(member);
                 var employee = await _employeeRepository.Get()
                     .Where(x => member.Equals(x.Visa)).FirstOrDefaultAsync();
                 if (null == employee)
                 {
                     throw new EmployeeNotFoundException($"Employee visa: {member} not found", member);
                 }
-                ProjectEmployee projectEmployee = new()
+                else
                 {
-                    Project = project,
-                    Employee = employee
-                };
-                await _projectEmployeeRepository.AddAsync(projectEmployee, cancellationToken);
-                await _projectEmployeeRepository.SaveChangesAsync(cancellationToken);
+                    employees.Add(employee);
+                }
             }
+            return employees;
         }
 
         public async Task<List<Project>?> GetAll(CancellationToken cancellationToken = default)
@@ -164,7 +197,7 @@ namespace PIMTool.Services
                 }
                 projects.Add(entity);
             });
-            _repository.Delete(projects);
+            _repository.DeleteRange(projects);
             await _repository.SaveChangesAsync();
             return true;
         }

@@ -14,11 +14,15 @@ namespace PIMTool.Core.Interfaces.Repositories
 
         void Update(T entity);
 
-        void Delete(List<T> entities);
+        void DeleteRange(IEnumerable<T> entities);
+        void Delete(T entity);
 
         void ClearChangeTracking();
 
+        void BeginTransaction();
+
         Task SaveChangesAsync(CancellationToken cancellationToken = default);
         Task<List<T>?> GetValuesAsync(CancellationToken cancellationToken = default);
+
     }
 }

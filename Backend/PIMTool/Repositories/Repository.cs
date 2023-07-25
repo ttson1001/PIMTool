@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using PIMTool.Core.Domain.Entities;
 using PIMTool.Core.Interfaces.Repositories;
 using PIMTool.Database;
@@ -9,6 +10,7 @@ namespace PIMTool.Repositories
     {
         private readonly PimContext _pimContext;
         private readonly DbSet<T> _set;
+        private IDbContextTransaction _transaction;
 
         public Repository(PimContext pimContext)
         {
@@ -41,14 +43,19 @@ namespace PIMTool.Repositories
             await _set.AddAsync(entity, cancellationToken);
         }
 
-        public void Update (T entity)
+        public void Update(T entity)
         {
-             _set.Update(entity);
+            _set.Update(entity);
         }
 
-        public void Delete(List<T> entities)
+        public void DeleteRange(IEnumerable<T> entities)
         {
             _set.RemoveRange(entities);
+        }
+
+        public void Delete(T entity)
+        {
+            _set.Remove(entity);
         }
 
         public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -59,6 +66,15 @@ namespace PIMTool.Repositories
         public void ClearChangeTracking()
         {
             _pimContext.ChangeTracker.Clear();
+        }
+
+        public void BeginTransaction()
+        {
+            if (_transaction != null)
+            {
+                throw new InvalidOperationException("A transaction is already in progress.");
+            }
+            _transaction = _pimContext.Database.BeginTransaction();
         }
     }
 }
